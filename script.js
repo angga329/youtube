@@ -1,73 +1,51 @@
 // script.js
 
-const searchBtn = document.getElementById('searchBtn');
-const musicQuery = document.getElementById('musicQuery');
-const resultContainer = document.getElementById('resultContainer');
+const convertBtn = document.getElementById('convertBtn');
+const ytUrlInput = document.getElementById('ytUrl');
+const resultArea = document.getElementById('resultArea');
 const loader = document.getElementById('loader');
 
-// Fungsi utama memanggil API
-async function playMusicYoutube(query, apikey) {
+// Fungsi utama memanggil API YTMP3
+async function downloadYTMP3(url, apikey) {
     try {
-        const response = await fetch(`https://anabot.my.id/api/download/playmusic?query=${encodeURIComponent(query)}&apikey=${encodeURIComponent(apikey)}`);
+        const response = await fetch(`https://anabot.my.id/api/download/ytmp3?url=${encodeURIComponent(url)}&apikey=${encodeURIComponent(apikey)}`);
         const data = await response.json();
         return data;
     } catch (error) {
-        return error;
+        console.error("Error API:", error);
+        return null;
     }
 }
 
-// Fungsi menjalankan pencarian
-const startSearch = async () => {
-    const query = musicQuery.value.trim();
-    const apikey = 'freeApikey'; // Gunakan apikey Anda
+// Handler saat tombol diklik
+convertBtn.addEventListener('click', async () => {
+    const url = ytUrlInput.value.trim();
+    const apikey = 'DhW5wSr5PB'; // Pastikan API Key benar
 
-    if (!query) {
-        alert("Masukkan judul lagu!");
+    if (!url) {
+        alert("Harap masukkan URL YouTube!");
         return;
     }
 
-    // Tampilkan Loading
+    // Tampilkan loader & bersihkan hasil lama
     loader.style.display = 'block';
-    resultContainer.innerHTML = '';
+    resultArea.innerHTML = '';
 
-    try {
-        const data = await playMusicYoutube(query, apikey);
+    const res = await downloadYTMP3(url, apikey);
+
+    loader.style.display = 'none';
+
+    if (res && res.status === 200) {
+        const item = res.result;
         
-        loader.style.display = 'none';
-
-        if (data.status === 200 && data.result) {
-            const music = data.result;
-            
-            // Render hasil ke HTML
-            resultContainer.innerHTML = `
-                <div class="music-info">
-                    <img src="${music.thumb}" alt="Cover">
-                    <h3>${music.title}</h3>
-                    <p>${music.channel}</p>
-                    <audio controls autoplay>
-                        <source src="${music.url}" type="audio/mpeg">
-                        Browser Anda tidak mendukung pemutar audio.
-                    </audio>
-                    <div style="margin-top: 20px;">
-                        <a href="${music.url}" target="_blank" style="color: #ff0000; text-decoration: none; font-size: 12px; font-weight: bold;">
-                            📥 DOWNLOAD MP3
-                        </a>
-                    </div>
-                </div>
-            `;
-        } else {
-            resultContainer.innerHTML = `<p style="color: #ff4d4d;">Musik tidak ditemukan.</p>`;
-        }
-    } catch (err) {
-        loader.style.display = 'none';
-        resultContainer.innerHTML = `<p style="color: #ff4d4d;">Terjadi kesalahan sistem.</p>`;
+        resultArea.innerHTML = `
+            <div class="download-box">
+                <h4>${item.title || 'Musik Berhasil Dikonversi'}</h4>
+                <p style="color: #888; font-size: 12px; margin-bottom: 15px;">Ukuran: ${item.size || 'N/A'}</p>
+                <a href="${item.url}" class="btn-download" download>Download Sekarang</a>
+            </div>
+        `;
+    } else {
+        resultArea.innerHTML = `<p style="color: #ff4d4d; margin-top: 20px;">Gagal mengonversi. Pastikan URL benar atau API aktif.</p>`;
     }
-};
-
-// Event klik tombol
-searchBtn.addEventListener('click', startSearch);
-
-// Event tekan Enter
-musicQuery.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') startSearch();
 });
