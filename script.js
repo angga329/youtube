@@ -1,51 +1,42 @@
-// script.js
-
 const convertBtn = document.getElementById('convertBtn');
-const ytUrlInput = document.getElementById('ytUrl');
-const resultArea = document.getElementById('resultArea');
-const loader = document.getElementById('loader');
+const ytUrl = document.getElementById('ytUrl');
+const resultContainer = document.getElementById('resultContainer');
+const loading = document.getElementById('loading');
 
-// Fungsi utama memanggil API YTMP3
-async function downloadYTMP3(url, apikey) {
-    try {
-        const response = await fetch(`https://anabot.my.id/api/download/ytmp3?url=${encodeURIComponent(url)}&apikey=${encodeURIComponent(apikey)}`);
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error("Error API:", error);
-        return null;
-    }
-}
-
-// Handler saat tombol diklik
 convertBtn.addEventListener('click', async () => {
-    const url = ytUrlInput.value.trim();
-    const apikey = 'ascent'; // Pastikan API Key benar
+    const url = ytUrl.value.trim();
 
-    if (!url) {
-        alert("Harap masukkan URL YouTube!");
-        return;
-    }
+    if (!url) return alert("Tempel link YouTube-nya dulu!");
 
-    // Tampilkan loader & bersihkan hasil lama
-    loader.style.display = 'block';
-    resultArea.innerHTML = '';
+    // UI Reset
+    loading.style.display = 'block';
+    resultContainer.innerHTML = '';
 
-    const res = await downloadYTMP3(url, apikey);
+    try {
+        // Panggil API Deline
+        const response = await fetch(`https://api.deline.web.id/downloader/ytmp3?url=${encodeURIComponent(url)}`);
+        const data = await response.json();
 
-    loader.style.display = 'none';
+        loading.style.display = 'none';
 
-    if (res && res.status === 200) {
-        const item = res.result;
-        
-        resultArea.innerHTML = `
-            <div class="download-box">
-                <h4>${item.title || 'Musik Berhasil Dikonversi'}</h4>
-                <p style="color: #888; font-size: 12px; margin-bottom: 15px;">Ukuran: ${item.size || 'N/A'}</p>
-                <a href="${item.url}" class="btn-download" download>Download Sekarang</a>
-            </div>
-        `;
-    } else {
-        resultArea.innerHTML = `<p style="color: #ff4d4d; margin-top: 20px;">Gagal mengonversi. Pastikan URL benar atau API aktif.</p>`;
+        // Sesuaikan dengan response API Deline (biasanya di data.result atau langsung data)
+        const result = data.result || data;
+
+        if (result && result.url) {
+            resultContainer.innerHTML = `
+                <div class="download-card">
+                    <img src="${result.thumbnail || ''}" alt="Thumbnail">
+                    <h4>${result.title || 'Musik Ditemukan'}</h4>
+                    <a href="${result.url}" class="dl-link" download>📥 Download MP3</a>
+                </div>
+            `;
+        } else {
+            resultContainer.innerHTML = `<p style="color:#f87171">Gagal mengambil link download.</p>`;
+        }
+
+    } catch (error) {
+        loading.style.display = 'none';
+        resultContainer.innerHTML = `<p style="color:#f87171">Terjadi kesalahan koneksi.</p>`;
+        console.error(error);
     }
 });
