@@ -3,27 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YT Music Player</title>
+    <title>YouTube to MP3 Converter</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <div class="player-card">
-        <h1>Music Player</h1>
-        
-        <div class="search-box">
-            <input type="text" id="musicQuery" placeholder="Cari lagu atau artis...">
-            <button id="searchBtn">Cari</button>
+    <div class="converter-card">
+        <div class="header">
+            <img src="https://www.gstatic.com/youtube/img/branding/youtubelogo/svg/youtubelogo.svg" alt="YT Logo" width="120">
+            <h2>MP3 Downloader</h2>
         </div>
 
-        <div id="loader" class="loader"></div>
+        <div class="input-group">
+            <input type="text" id="ytUrl" placeholder="Tempel link YouTube di sini (https://...)">
+            <button id="convertBtn">Konversi</button>
+        </div>
 
-        <div id="resultContainer">
-            <div class="empty-state">
-                <p>Masukkan judul lagu untuk mulai memutar</p>
+        <div id="loader" class="loader-container" style="display: none;">
+            <div class="spinner"></div>
+            <p>Memproses audio...</p>
+        </div>
+
+        <div id="resultArea">
             </div>
-        </div>
     </div>
 
     <script src="script.js"></script>
