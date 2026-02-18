@@ -20,7 +20,7 @@ async function downloadYTMP3(url, apikey) {
 // Handler saat tombol diklik
 convertBtn.addEventListener('click', async () => {
     const url = ytUrlInput.value.trim();
-    const apikey = 'DhW5wSr5PB'; // Pastikan API Key benar
+    const apikey = 'ascent'; // Pastikan API Key benar
 
     if (!url) {
         alert("Harap masukkan URL YouTube!");
